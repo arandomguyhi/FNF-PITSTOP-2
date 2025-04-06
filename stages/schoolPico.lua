@@ -53,13 +53,13 @@ function onCreatePost()
             if i == 'boyfriend' then
                 setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
 
-                setShaderSampler2D(i, 'altMask', 'masks/picoPixel_mask')
+                setShaderSampler2D(i, 'altMask', path..'masks/picoPixel_mask')
                 setShaderFloat(i, 'thr2', 1)
                 setShaderBool(i, 'useMask', true)
             elseif i == 'gf' then
                 setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
 
-                setShaderSampler2D(i, 'altMask', 'masks/nenePixel_mask')
+                setShaderSampler2D(i, 'altMask', path..'masks/nenePixel_mask')
                 setShaderFloat(i, 'thr2', 1)
                 setShaderBool(i, 'useMask', true)
 
@@ -69,7 +69,7 @@ function onCreatePost()
             else
                 setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
 
-                setShaderSampler2D(i, 'altMask', 'masks/senpai_mask')
+                setShaderSampler2D(i, 'altMask', path..'masks/senpai_mask')
                 setShaderFloat(i, 'thr2', 1)
                 setShaderBool(i, 'useMask', true)
             end
