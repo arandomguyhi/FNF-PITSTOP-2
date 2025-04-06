@@ -19,7 +19,8 @@ function createSplash(index, color)
     setProperty(name..'.blend', 0)
 
     setObjectCamera(name, 'hud')
-    addLuaSprite(name, true)
+    setObjectOrder(name, getObjectOrder('noteGroup')+1)
+    addLuaSprite(name)
     scaleObject(name, 4, 4)
     setProperty(name..'.antialiasing', false)
 

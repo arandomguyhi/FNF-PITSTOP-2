@@ -1,16 +1,13 @@
 luaDebugMode = true
 
 local path = '../week6/weeb/'
-local diaJson = callMethodFromClass('tjson.TJSON', 'parse', {getTextFromFile('dialogue/conversations/senpai-pico.json')})
+local diaJson = callMethodFromClass('tjson.TJSON', 'parse', {getTextFromFile('dialogue/conversations/roses-pico.json')})
 
 setVar('isTalking', true)
 local curDia = 1
 
 function onCustomSubstateCreate(name)
     if name == 'dialogue' then
-        playMusic('../week6/music/'..diaJson.music.asset, 1, diaJson.music.looped)
-        soundFadeIn('', diaJson.music.fadeTime, 0, 1)
-
         makeLuaSprite('back')
         makeGraphic('back', screenWidth*1.2, screenHeight*1.2, diaJson.backdrop.color:gsub('#', ''))
         setObjectCamera('back', 'other')
@@ -84,7 +81,6 @@ function onCustomSubstateUpdate(name)
                 for _, spr in pairs({'back', 'boxSprite', 'portrait', 'textDisplay'}) do
                     startTween('bzl'.._, spr, {alpha = 0}, 1, {onComplete = 'startCountdown'})
                 end
-                soundFadeIn('', diaJson.outro.fadeTime, 1, 0)
                 closeCustomSubstate()
             end
         end
@@ -95,31 +91,11 @@ function onStartCountdown()
     if not allowCountdown then
         allowCountdown = true
 
-        makeLuaSprite('black', nil, -20, -20)
-        makeGraphic('black', screenWidth * 1.5, screenHeight * 1.5, '000000')
-        setObjectCamera('black', 'other')
-        addLuaSprite('black', true)
-
-        runTimer('removeBlack', 0.25)
-        onTimerCompleted = function(tag)
-            if tag == 'removeBlack' then
-                removeLuaSprite('black', true)
-                cameraFade('game', '000000', 2, false, true)
-            end
+        playSound('ANGRY_TEXT_BOX')
+        runTimer('openSub', 0.01)
+        onTimerCompleted = function(tag) if tag == 'openSub' then
+            openCustomSubstate('dialogue') end
         end
-
-        runHaxeCode([[
-            var tweenFunction = function(x) {
-                var xSnapped = Math.floor(x * 8) / 8;
-            };
-
-            FlxTween.num(0.0, 1.0, 2.0, {
-                ease: FlxEase.linear,
-                startDelay: 0.25,
-                onComplete: function (input) {
-                    callOnLuas('openCustomSubstate', ['dialogue']);
-                }}, tweenFunction);
-        ]])
 
         return Function_Stop
     end
@@ -156,7 +132,6 @@ function appendText(newText)
     callMethod('textDisplay.start', {0.05})
 end
 
-local musicStopped = false
 function changePortrait(port)
     local portJson = callMethodFromClass('tjson.TJSON', 'parse', {getTextFromFile('dialogue/speakers/'..port..'.json')})
 
@@ -175,15 +150,6 @@ function changePortrait(port)
     setObjectOrder('textDisplay', getObjectOrder('boxSprite')+1)
 
     playAnim('portrait', diaJson.dialogue[curDia].speakerAnimation, true)
-
-    if port == 'senpai-bwuh' then
-        musicStopped = true
-        pauseSound('')
-    elseif musicStopped and port == 'senpai' then
-        musicStopped = false
-        resumeSound('')
-        soundFadeIn('', 2, 0, 1)
-    end
 end
 
 function touchedScreen()

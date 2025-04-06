@@ -63,7 +63,9 @@ function onCreatePost()
                 setShaderFloat(i, 'thr2', 1)
                 setShaderBool(i, 'useMask', true)
 
-                callOnLuas('addSunsetShader', {''})
+                if version >= '1.0' then
+                    callOnLuas('addSunsetShader', {''})
+                end
             else
                 setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
 
@@ -92,8 +94,12 @@ end
 
 function onUpdatePost()
     if shadersEnabled then
-        for _, i in pairs({'boyfriend', 'dad', 'gf', 'abotSpeaker'}) do
+        for _, i in pairs({'boyfriend', 'dad', 'gf'}) do
             updateFrameInfo(i)
+        end
+
+        if version >= '1.0' then
+            updateFrameInfo('abotSpeaker')
         end
     end
 end

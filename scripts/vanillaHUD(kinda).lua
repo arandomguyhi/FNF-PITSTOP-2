@@ -5,7 +5,7 @@ luaDebugMode = true
 function onCreate()
     isPixel = getPropertyFromClass('states.PlayState', 'isPixelStage')
     prevGhostTap = getPropertyFromClass('backend.ClientPrefs', 'data.ghostTapping')
-    setPropertyFromClass('backend.ClientPrefs', 'data.ghostTapping', false)
+    setPropertyFromClass('backend.ClientPrefs', 'data.ghostTapping', false)    
 end
 
 function onStartCountdown()
@@ -54,6 +54,14 @@ function onStartCountdown()
     end
 end
 
+function onCountdownTick(t) -- that's pretty dumb ik
+    if t == 0 then
+        for i = 0,7 do
+            setProperty('strumLineNotes.members['..i..'].x', getProperty('strumLineNotes.members['..i..'].x')-35)
+        end
+    end
+end
+
 function onUpdatePost()
     setTextString('newScore', 'Score: '..score)
 
@@ -63,11 +71,6 @@ function onUpdatePost()
 
         if getProperty('opGlow'..holdColors[i]..'.animation.curAnim.finished') then
             setProperty('opGlow'..holdColors[i]..'.alpha', .001) end
-    end
-
-    for i = 0, getProperty('grpNoteSplashes.length')-1 do
-        setPropertyFromGroup('grpNoteSplashes', i, 'scale.x', 6)
-        setPropertyFromGroup('grpNoteSplashes', i, 'scale.y', 6)
     end
 end
 

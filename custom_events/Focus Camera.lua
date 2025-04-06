@@ -65,6 +65,14 @@ function onEvent(name, value1, value2)
 				end
 			end
 		end
+
+		if gfName == 'nene-pixel' then
+			if value1:find('Opponent') then
+				playAnim('abotHead', 'toleft')
+			elseif value1:find('Player') then
+				playAnim('abotHead', 'toright')
+			end
+		end
     end
 end
 

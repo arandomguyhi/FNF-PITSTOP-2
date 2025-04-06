@@ -1,5 +1,8 @@
 luaDebugMode = true
 
+if version < '1.0' then
+    return end
+
 makeAnimatedLuaSprite('abotHead', 'characters/abotPixel/abotHead', getProperty('gfGroup.x')-240, getProperty('gfGroup.y')+200)
 scaleObject('abotHead', 6, 6)
 setProperty('abotHead.antialiasing', false)
