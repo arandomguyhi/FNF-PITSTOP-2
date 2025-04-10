@@ -6,21 +6,14 @@ local group = {}
 local isErect = false
 local tankmanSprite = require('mods/'..currentModDirectory..'/stages/props/TankmanSprite')
 
-function group:new(erect)
-    runHaxeCode([[
-        var tankGroup = new FlxTypedSpriteGroup(0, 0, 4);
-        setVar('tankGroup', tankGroup);
-    ]])
+-- removed the actual group cuz it was useless
 
+function group:new(erect)
     isErect = (erect ~= nil) and erect or false
 end
 
-function group.add()
-    runHaxeCode("addBehindGF(getVar('tankGroup'));")
-end
-
 function group:reset()
-    callMethod('tankGroup.group.clear', {''})
+    --callMethod('tankGroup.group.clear', {''})
     initTimemap()
 end
 
@@ -32,9 +25,8 @@ function initTimemap()
         for (section in tanker.notes) {
             for (noteJunk in section.sectionNotes) {
                 var leData = Std.int(noteJunk[1] % 4);
-                tankTime.push(noteJunk[0]);
 
-                if (FlxG.random.bool(6.25)) {
+                if (FlxG.random.bool(15.25)) {
                     tankTime.push(noteJunk[0]);
                     var goingRight:Bool = (leData == 2 || leData == 3) ? false : true;
                     tankDir.push(goingRight); 
@@ -45,14 +37,9 @@ function initTimemap()
         setVar('tankmanTimes', tankTime);
         setVar('tankmanDirs', tankDir);
     ]])
-
-    createTankman(500, 350, getVar('tankmanTimes')[3], false, 1.10)
-    createTankman(500, 350, getVar('tankmanTimes')[8], true, 1.10)
-    createTankman(500, 350, getVar('tankmanTimes')[12], false, 1.10)
-    createTankman(500, 350, getVar('tankmanTimes')[30], false, 1.10)
 end
 
-function createTankman(initX, initY, time, right, scale)
+function createTankman(time, right, scale)
     tankmanSprite.strumTime = time
     tankmanSprite.endingOffset = getRandomFloat(50, 200)
     tankmanSprite.runSpeed = getRandomFloat(0.6, 1)
@@ -63,36 +50,29 @@ function createTankman(initX, initY, time, right, scale)
     local id = tankmanSprite.tankCount
     local name = 'tankmen'..id
 
-    setProperty(name..'.x', initX)
-    setProperty(name..'.y', initY)
     scaleObject(name, scale, scale, false)
     setProperty(name..'.flipX', not right)
-    runHaxeCode("getVar('tankGroup').add(game.getLuaObject('"..name.."'));")
 
     tankmanSprite.tankCount = tankmanSprite.tankCount + 1
-
-    if isErect then
-        tankmanSprite:addRimlight()
-    end
 end
 
 local timer = 0
 
 function onUpdate(elapsed)
-    --while true do
-    if getSongPosition() < 0 then return end
-
     tankmanSprite.update()
 
-    --[[local cutoff = getSongPosition() + (1000*3)
-    while (#getVar('tankmanTimes') > 1 and getVar('tankmanTimes')[1] <= cutoff) do
-        local nextTime = callMethod('tankmanTimes.shift', {''})
-        local goingRight = callMethod('tankmanDirs.shift', {''})
-        local xPos = 500
-        local yPos = 350
-        local scale = 1.10
-        createTankman(xPos, yPos, nextTime, goingRight, scale)
-    end]]
+    runHaxeCode([[
+        while (true) {
+            var cutoff = Conductor.songPosition + (1000*3);
+            if (getVar('tankmanTimes').length > 0 && getVar('tankmanTimes')[0] <= cutoff) {
+                var nextTime = getVar('tankmanTimes').shift();
+                var goingRight = getVar('tankmanDirs').shift();
+                var scale = 1.10;
+                parentLua.call('createTankman', [nextTime, goingRight, scale]);
+            } else
+                break;
+        }
+    ]])
 end
 
 function group:kill()

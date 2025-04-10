@@ -2,8 +2,5 @@ local tankmanGroup = require('mods/'..currentModDirectory..'/stages/props/Tankma
 
 precacheImage('../week7/images/tankmanKilled1')
 
-function onSongStart()
-    tankmanGroup:new()
-    tankmanGroup:reset()
-    tankmanGroup.add()
-end
+tankmanGroup:new(true)
+tankmanGroup:reset()

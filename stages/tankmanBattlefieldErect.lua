@@ -23,6 +23,58 @@ function onCreate()
     addLuaSprite('guy')
 end
 
+function onCreatePost()
+    if shadersEnabled then
+        initLuaShader('DropShadow')
+        for _, i in pairs({'boyfriend', 'dad', 'gf'}) do
+            setSpriteShader(i, 'DropShadow')
+
+            setAdjustColor(i, -46, -38, -25, -20)
+            setShaderFloatArray(i, 'dropColor', {223/255, 239/255, 60/255})
+            setShaderFloat(i, 'thr', 0.1)
+            updateFrameInfo(i)
+
+            if i == 'boyfriend' then
+                setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
+
+                runHaxeCode([[
+                    game.boyfriend.animation.callback = function() {
+                        parentLua.call('updateFrameInfo', ['boyfriend']);
+                    }
+                ]])
+            elseif i == 'gf' then
+                setShaderFloat(i, 'ang', 90 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
+
+                setShaderSampler2D(i, 'altMask', path..'masks/gfTankmen_mask')
+                setShaderFloat(i, 'thr2', 0.4)
+                setShaderBool(i, 'useMask', true)
+
+                runHaxeCode([[
+                    game.gf.animation.callback = function() {
+                        parentLua.call('updateFrameInfo', ['gf']);
+                    }
+                ]])
+            else
+                setShaderFloat(i, 'ang', 135 * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
+                setShaderFloat(i, 'thr', 0.3)
+
+                setShaderSampler2D(i, 'altMask', path..'masks/tankmanCaptainBloody_mask')
+                setShaderFloat(i, 'thr2', 1)
+                setShaderBool(i, 'useMask', false)
+
+                runHaxeCode([[
+                    game.dad.animation.callback = function() {
+                        parentLua.call('updateFrameInfo', ['dad']);
+                    }
+                ]])
+            end
+
+            setShaderFloat(i, 'dist', 15)
+            setShaderFloat(i, 'AA_STAGES', 2)
+        end
+    end
+end
+
 function onBeatHit()
     if getRandomBool(2) then
         sipTime = true
@@ -41,4 +93,25 @@ function onUpdate()
     if getProperty('sniper.animation.curAnim.name') == 'sip' and getProperty('sniper.animation.curAnim.finished') then
         sipTime = false
     end
+end
+
+function onEvent(name)
+    if name == 'enableMask' then
+        setShaderBool('dad', 'useMask', true)
+    end
+end
+
+function setAdjustColor(spr,b,h,c,s)
+    setShaderFloat(spr, 'brightness', b)
+    setShaderFloat(spr, 'hue', h)
+    setShaderFloat(spr, 'contrast', c)
+    setShaderFloat(spr, 'saturation', s)
+end
+
+function updateFrameInfo(spr)
+    setShaderFloatArray(spr, 'uFrameBounds', {
+        getProperty(spr..'.frame.uv.x'), getProperty(spr..'.frame.uv.y'),
+        getProperty(spr..'.frame.uv.width'), getProperty(spr..'.frame.uv.height')
+    })
+    setShaderFloat(spr, 'angOffset', getProperty(spr..'.frame.angle') * getPropertyFromClass('flixel.math.FlxAngle', 'TO_RAD'))
 end

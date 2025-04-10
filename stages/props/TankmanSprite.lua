@@ -11,7 +11,7 @@ local tankData = {}
 
 function tankSpr:new(id)
     local i = 'tankmen'..id
-    makeAnimatedLuaSprite(i, '../week7/images/tankmanKilled1')
+    makeAnimatedLuaSprite(i, '../week7/images/tankmanKilled1', 500, 350)
     addAnimationByPrefix(i, 'run', 'tankman running', 24, true)
     addAnimationByPrefix(i, 'shot', 'John Shot '..getRandomInt(1,2), 24, false)
     scaleObject(i, 0.4, 0.4)
@@ -25,39 +25,57 @@ function tankSpr:new(id)
         hasShot = false
     }
 
+    setObjectOrder(i, getObjectOrder('guy')+1)
+
     addLuaSprite(i)
     initAnim(id)
-end
 
-function deathFlicker()
-    --
-end
-
-function kill()
-    for i = 1, tankSpr.tankCount do
-        removeLuaSprite('tankmen'..i)
+    if shadersEnabled then
+        addRimlight(id)
     end
 end
 
-function tankSpr:addRimlight()
+function deathFlicker(tankName)
+    runHaxeCode([[
+        import flixel.effects.FlxFlicker;
+
+        var tankmanFlicker:FlxFlicker = null;
+        tankmanFlicker = FlxFlicker.flicker(game.getLuaObject(']]..tankName..[['), 0.3, 1 / 30, false, true, function(cu:FlxFlicker) {
+            tankmanFlicker = null;
+			parentLua.call('kill', [']]..tankName..[[']);
+        });
+    ]])
+end
+
+function kill(tank)
+    removeLuaSprite(tank, true)
+end
+
+function addRimlight(id)
     if shadersEnabled then
-        makeLuaSprite('rim') setSpriteShader('rim', 'DropShadow')
+        local name = 'tankmen'..id
 
-        setShaderFloat('rim', 'brightness', -46)
-        setShaderFloat('rim', 'hue', -38)
-        setShaderFloat('rim', 'contrast', -25)
-        setShaderFloat('rim', 'saturation', -20)
+        setSpriteShader(name, 'DropShadow')
 
-        setShaderFloat('rim', 'thr', 0.4)
-        setShaderFloatArray('rim', 'dropColor', {223/255, 239/255, 60/255})
+        setShaderFloat(name, 'brightness', -46)
+        setShaderFloat(name, 'hue', -38)
+        setShaderFloat(name, 'contrast', -25)
+        setShaderFloat(name, 'saturation', -20)
 
-        runHaxeCode("getVar('tankmanSprite').shader = game.getLuaObject('rim').shader;")
+        setShaderFloat(name, 'thr', 0.4)
+        setShaderFloatArray(name, 'dropColor', {223/255, 239/255, 60/255})
 
-        setShaderFloat('rim', 'ang', 135)
-        setShaderFloat('rim', 'str', 1)
-        setShaderFloat('rim', 'dist', 15)
-        setShaderFloat('rim', 'AA_STAGES', 2)
-        setShaderBool('rim', 'altMask', false)
+        runHaxeCode([[
+            game.getLuaObject(']]..name..[[').animation.callback = function() {
+                parentLua.call('updateFrameInfo', [']]..name..[[']);
+            }
+        ]])
+
+        setShaderFloat(name, 'ang', 135)
+        setShaderFloat(name, 'str', 1)
+        setShaderFloat(name, 'dist', 15)
+        setShaderFloat(name, 'AA_STAGES', 2)
+        setShaderBool(name, 'altMask', false)
     end
 end
 
@@ -95,8 +113,15 @@ function tankSpr.update()
     for id, data in pairs(tankData) do
         local tank = data.id
 
-        if getProperty(tank..'.animation.curAnim.name') == 'shot' and getProperty(tank..'.animation.curAnim.curFrame') >= 10 then
-            deathFlicker()
+        if shadersEnabled then
+            if luaSpriteExists(tank) then
+            --updateFrameInfo(tank)
+            end
+        end
+
+        if getProperty(tank..'.animation.curAnim.name') == 'shot' and getProperty(tank..'.animation.curAnim.curFrame') >= 10 and not data.hasShot then
+            data.hasShot = true
+            deathFlicker(tank)
         end
 
         if songPos >= data.strumTime and getProperty(tank..'.animation.curAnim.name') == 'run' then

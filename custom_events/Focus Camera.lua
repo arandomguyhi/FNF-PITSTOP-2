@@ -1,7 +1,11 @@
 -- I'M MAKING THIS MUCH BETTER LATER I PROMISE :SOB:
 luaDebugMode = true
 
+setProperty('isCameraOnForcedPos', true)
+
 local tweenDuration = 0
+local tweenTime = false
+
 function onEvent(name, value1, value2)
     if name == 'Focus Camera' then
 		local splitV1 = stringSplit(value1, ',')
@@ -16,6 +20,7 @@ function onEvent(name, value1, value2)
 
 		if not string.find(value1, ',') then
 			cancelTween('camTween')
+			tweenTime = false
 			if value1 == 'Opponent' then
 				cameraSetTarget('dad')
 			elseif value1 == 'Player' then
@@ -25,13 +30,17 @@ function onEvent(name, value1, value2)
 				setProperty('camFollow.y', gfCamY)
 			end
 		else
-			if value2 ~= '' and value2 ~= 'instant' then tweenDuration = (stepCrochet/1000)*tonumber(splitV2[1]) end
+			if value2 ~= '' and value2 ~= 'instant' then
+				tweenDuration = (stepCrochet/1000)*tonumber(splitV2[1])
+				setProperty('cameraSpeed', splitV2[1] / 2)
+			end
 
 			if splitV1[1] == 'Opponent' then
 				if value2 ~= '' and value2 ~= 'instant' then
+					tweenTime = true
 					startTween('camTween', 'camFollow', {x = dadCamX + splitV1[2], y = dadCamY + splitV1[3]}, tweenDuration/2, {ease = tostring(splitV2[2])})
 				elseif value2 == 'instant' then
-					callMethod('camFollow.setPosition', {dadCamX + splitV1[2], dadCamY + splitV1[3]})
+					callMethod('camPoint.setPosition', {dadCamX + splitV1[2], dadCamY + splitV1[3]})
 					setProperty('camGame.scroll.x', dadCamX + splitV1[2] - (screenWidth/2))
 					setProperty('camGame.scroll.y', dadCamY + splitV1[3] - (screenHeight/2))
 				else
@@ -41,9 +50,9 @@ function onEvent(name, value1, value2)
 				end
 			elseif splitV1[1] == 'Player' then
 				if value2 ~= '' and value2 ~= 'instant' then
-					startTween('camTween', 'camFollow', {x = bfCamX + splitV1[2], y = bfCamY + splitV1[3]}, tweenDuration/2, {ease = tostring(splitV2[2])})
+					startTween('camTween', 'camPoint', {x = bfCamX + splitV1[2], y = bfCamY + splitV1[3]}, tweenDuration/2, {ease = tostring(splitV2[2])})
 				elseif value2 == 'instant' then
-					callMethod('camFollow.setPosition', {bfCamX + splitV1[2], bfCamY + splitV1[3]})
+					callMethod('camPoint.setPosition', {bfCamX + splitV1[2], bfCamY + splitV1[3]})
 					setProperty('camGame.scroll.x', bfCamX + splitV1[2] - (screenWidth/2))
 					setProperty('camGame.scroll.y', bfCamY + splitV1[3] - (screenHeight/2))
 				else
@@ -53,15 +62,15 @@ function onEvent(name, value1, value2)
 				end
 			elseif splitV1[1] == 'Girlfriend' then
 				if value2 ~= '' and value2 ~= 'instant' then
-					startTween('camTween', 'camFollow', {x = gfCamX + splitV1[2], y = gfCamY + splitV1[3]}, tweenDuration/2, {ease = tostring(splitV2[2])})
+					startTween('camTween', 'camPoint', {x = gfCamX + splitV1[2], y = gfCamY + splitV1[3]}, tweenDuration/2, {ease = tostring(splitV2[2])})
 				elseif value2 == 'instant' then
-					callMethod('camFollow.setPosition', {gfCamX + splitV1[2], gfCamY + splitV1[3]})
+					callMethod('camPoint.setPosition', {gfCamX + splitV1[2], gfCamY + splitV1[3]})
 					setProperty('camGame.scroll.x', gfCamX + splitV1[2] - (screenWidth/2))
 					setProperty('camGame.scroll.y', gfCamY + splitV1[3] - (screenHeight/2))
 				else
 					if value2 ~= '' then return end
-					setProperty('camFollow.x', gfCamX + splitV1[2])
-					setProperty('camFollow.y', gfCamY + splitV1[3])
+					setProperty('camPoint.x', gfCamX + splitV1[2])
+					setProperty('camPoint.y', gfCamY + splitV1[3])
 				end
 			end
 		end
@@ -74,8 +83,4 @@ function onEvent(name, value1, value2)
 			end
 		end
     end
-end
-
-function onUpdate()
-    setProperty('isCameraOnForcedPos', true)
 end
