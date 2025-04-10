@@ -8,7 +8,7 @@ tankmanGroup:new(true)
 tankmanGroup:reset()
 
 function onStartCountdown()
-    if not hasPlayedVideo then
+    if not hasPlayedVideo and not seenCutscene then
         hasPlayedVideo = true
 
         callMethod('startVideo', {'stressPicoCutscene', true, false, false, true})

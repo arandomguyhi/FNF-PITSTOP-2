@@ -92,7 +92,7 @@ function onCustomSubstateUpdate(name)
 end
 
 function onStartCountdown()
-    if not allowCountdown then
+    if not allowCountdown and not seenCutscene then
         allowCountdown = true
 
         makeLuaSprite('black', nil, -20, -20)

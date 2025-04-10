@@ -88,7 +88,7 @@ function onCustomSubstateUpdate(name)
 end
 
 function onStartCountdown()
-    if not allowCountdown then
+    if not allowCountdown and not seenCutscene then
         allowCountdown = true
 
         playSound('ANGRY_TEXT_BOX')

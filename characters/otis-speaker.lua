@@ -10,7 +10,7 @@ function onCreate()
 
     setObjectOrder('abot', getObjectOrder('dadGroup')-1)
 
-    setObjectOrder('gfGroup', getObjectOrder('abot')+1)
+    setObjectOrder('gfGroup', getObjectOrder('abot'))
     setScrollFactor('gfGroup', 1, 1)
 
     runHaxeCode([[
