@@ -20,7 +20,8 @@ function onEvent(name, value1, value2)
 
 		if not string.find(value1, ',') then
 			cancelTween('camTween')
-			tweenTime = false
+			setProperty('cameraSpeed', 1)
+
 			if value1 == 'Opponent' then
 				cameraSetTarget('dad')
 			elseif value1 == 'Player' then
@@ -32,7 +33,7 @@ function onEvent(name, value1, value2)
 		else
 			if value2 ~= '' and value2 ~= 'instant' then
 				tweenDuration = (stepCrochet/1000)*tonumber(splitV2[1])
-				setProperty('cameraSpeed', splitV2[1] / 2)
+				setProperty('cameraSpeed', (splitV2[1] / tweenDuration)/2)
 			end
 
 			if splitV1[1] == 'Opponent' then

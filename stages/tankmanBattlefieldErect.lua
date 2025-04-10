@@ -98,6 +98,13 @@ end
 function onEvent(name)
     if name == 'enableMask' then
         setShaderBool('dad', 'useMask', true)
+
+        setProperty('dad.idleSuffix', '-bloody')
+        for i = 0, getProperty('unspawnNotes.length')-1 do
+            if not getProperty('unspawnNotes['..i..'].mustPress') then
+                setProperty('unspawnNotes['..i..'].animSuffix', '-bloody')
+            end
+        end
     end
 end
 
